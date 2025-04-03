@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тематика обращения</title>
+  <style>
+    body { font-family: sans-serif; padding: 10px; }
+    select, button { width: 100%; padding: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h3>Тематика обращения</h3>
+  <select id="topic">
+    <option value="">-- Выберите тему --</option>
+    <option value="оплата">Оплата</option>
+    <option value="доставка">Доставка</option>
+    <option value="технический вопрос">Технический вопрос</option>
+    <option value="жалоба">Жалоба</option>
+    <option value="консультация">Консультация</option>
+    <option value="другое">Другое</option>
+  </select>
+
+  <button onclick="saveTopic()">Сохранить тематику</button>
+
+  <script>
+    async function saveTopic() {
+      const topic = document.getElementById('topic').value;
+      if (!topic) {
+        alert('Пожалуйста, выберите тематику.');
+        return;
+      }
+
+      const conversationId = new URLSearchParams(window.location.search).get('conv_id');
+
+      const payload = {
+        custom_attributes: {
+          topic: topic
+        }
+      };
+
+      const response = await fetch(`/api/v1/conversations/${conversationId}/custom_attributes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'api_access_token': window.location.hash.replace('#', '') // предполагается, что токен передаётся через #
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (response.ok) {
+        alert('Тематика сохранена!');
+      } else {
+        alert('Ошибка при сохранении.');
+      }
+    }
+  </script>
+</body>
+</html>
